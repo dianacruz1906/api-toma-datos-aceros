@@ -82,4 +82,4 @@ test/            pruebas de integración (node:test + supertest)
 ```
 
 ## Versionamiento
-Repositorio Git con commits por funcionalidad (`git log --oneline`). El enlace remoto está en `REPOSITORIO.txt`.
+Repositorio Git con commits por funcionalidad (`git log --oneline`). Enlace: https://github.com/dianacruz1906/api-toma-datos-aceros

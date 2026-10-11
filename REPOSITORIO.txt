@@ -1,10 +1,10 @@
-ENLACE DEL REPOSITORIO (GitHub/GitLab)
-======================================
-https://github.com/SU_USUARIO/api-toma-datos-aceros      <-- REEMPLAZAR por su enlace real
+REPOSITORIO DEL PROYECTO
+========================
+Aprendiz: Diana Cruz
+Evidencia: AA5-EV03 – Construcción de API
 
-Para publicarlo (desde la carpeta api-toma-datos-aceros, que ya contiene el repositorio Git con su historial):
+Enlace del repositorio (GitHub):
+https://github.com/dianacruz1906/api-toma-datos-aceros
 
-  git config user.name  "Su Nombre"
-  git config user.email "su_correo@ejemplo.com"
-  git remote add origin https://github.com/SU_USUARIO/api-toma-datos-aceros.git
-  git push -u origin main
+URL de clonación:
+https://github.com/dianacruz1906/api-toma-datos-aceros.git
