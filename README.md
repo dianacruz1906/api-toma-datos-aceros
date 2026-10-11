@@ -78,7 +78,7 @@ src/
   controllers/   capa HTTP
   services/      reglas de negocio, SharePoint (simulado), PDF/Excel
   utils/         esquemas zod, cálculos, ApiError
-docs/            openapi.yaml, DISENO_API.md, postman_collection.json
+docs/            openapi.yaml, DISENO_API.md, ENDPOINTS.md
 test/            pruebas de integración (node:test + supertest)
 docs/postman/    colección (66 peticiones, 259 verificaciones) y entorno Local
 docs/pruebas/    reporte de ejecución y documento de pruebas
