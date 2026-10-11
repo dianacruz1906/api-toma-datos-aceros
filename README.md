@@ -6,7 +6,7 @@ API REST (Node.js + Express + SQLite) que digitaliza el flujo del laboratorio de
 > Proyecto formativo – Evidencia AA5-EV03 · Componente "Construcción de API".
 
 ## Requisitos
-- Node.js 18 o superior (probado en 22) y npm.
+- Node.js 18 o superior (probado en 22) y npm, con acceso a internet para la primera instalación.
 
 ## Instalación y ejecución
 ```bash
