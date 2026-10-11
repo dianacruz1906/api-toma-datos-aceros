@@ -2,8 +2,8 @@ const db = require('../db/database');
 const ApiError = require('../utils/apiError');
 const { calcularBarra } = require('../utils/calculos');
 
-const incluyeTension = (e) => e.includes('Tensión');
-const incluyeGeometria = (e) => e.includes('Geometría');
+const incluyeTension = (e) => e.toLowerCase().includes('tensión');
+const incluyeGeometria = (e) => e.toLowerCase().includes('geometría');
 const CAMPOS_S1 = ['descripcion', 'diametro', 'longitud_cm', 'masa_g',
   'espaciamiento_resaltes_s', 'longitud_resaltes_cm', 'numero_resaltes'];
 
