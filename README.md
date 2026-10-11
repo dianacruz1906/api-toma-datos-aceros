@@ -15,10 +15,11 @@ cp .env.example .env      # (en Windows: copy .env.example .env)
 npm run seed              # opcional: crea usuarios de prueba (también se crean al iniciar)
 npm start                 # http://localhost:3000
 npm test                  # pruebas de integración del flujo completo
+npm run test:postman      # colección Postman con Newman (requiere la API corriendo en otra terminal)
 ```
 - Documentación interactiva (Swagger UI): **http://localhost:3000/api/docs**
 - Especificación OpenAPI: `docs/openapi.yaml` · Diseño: `docs/DISENO_API.md`
-- Colección Postman: `docs/postman_collection.json`
+- Pruebas con Postman: `docs/postman/` (colección y entorno) · Endpoints: `docs/ENDPOINTS.md` · Resultados: `docs/pruebas/`
 
 ## Usuarios de prueba
 | Usuario | Clave | Rol |
@@ -79,6 +80,8 @@ src/
   utils/         esquemas zod, cálculos, ApiError
 docs/            openapi.yaml, DISENO_API.md, postman_collection.json
 test/            pruebas de integración (node:test + supertest)
+docs/postman/    colección (66 peticiones, 259 verificaciones) y entorno Local
+docs/pruebas/    reporte de ejecución y documento de pruebas
 ```
 
 ## Versionamiento

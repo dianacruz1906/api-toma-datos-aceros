@@ -1,0 +1,3338 @@
+{
+  "info": {
+    "name": "API Toma de datos – Ensayos de aceros (Pruebas AA5-EV04)",
+    "description": "Pruebas automáticas de todos los servicios. Ejecute las carpetas en orden (Runner > Run collection) con el entorno \"Local\".",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "tokenAdmin",
+      "value": ""
+    },
+    {
+      "key": "tokenCoordinador",
+      "value": ""
+    },
+    {
+      "key": "tokenInformes",
+      "value": ""
+    },
+    {
+      "key": "tokenEnsayos1",
+      "value": ""
+    },
+    {
+      "key": "tokenEnsayos2",
+      "value": ""
+    },
+    {
+      "key": "tokenGerente",
+      "value": ""
+    },
+    {
+      "key": "analistaId",
+      "value": ""
+    },
+    {
+      "key": "odtId",
+      "value": ""
+    },
+    {
+      "key": "odtGeoId",
+      "value": ""
+    },
+    {
+      "key": "odtTmpId",
+      "value": ""
+    },
+    {
+      "key": "usuarioNuevoId",
+      "value": ""
+    },
+    {
+      "key": "nuevoUsuario",
+      "value": ""
+    },
+    {
+      "key": "consecutivo1",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "00 Sistema",
+      "item": [
+        {
+          "name": "Estado del servicio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"estado = ok\", function () { pm.expect(pm.response.json().estado).to.eql(\"ok\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 Autenticación",
+      "item": [
+        {
+          "name": "Login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Devuelve token Bearer\", function () { var j = pm.response.json(); pm.expect(j.token).to.be.a(\"string\"); pm.expect(j.tipo).to.eql(\"Bearer\"); });",
+                  "var _j = pm.response.json();",
+                  "pm.collectionVariables.set(\"tokenAdmin\", String(_j.token));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"admin\",\n  \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Login coordinador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Devuelve token Bearer\", function () { var j = pm.response.json(); pm.expect(j.token).to.be.a(\"string\"); pm.expect(j.tipo).to.eql(\"Bearer\"); });",
+                  "var _j = pm.response.json();",
+                  "pm.collectionVariables.set(\"tokenCoordinador\", String(_j.token));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"coordinador\",\n  \"password\": \"coord123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Login analista de informes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Devuelve token Bearer\", function () { var j = pm.response.json(); pm.expect(j.token).to.be.a(\"string\"); pm.expect(j.tipo).to.eql(\"Bearer\"); });",
+                  "var _j = pm.response.json();",
+                  "pm.collectionVariables.set(\"tokenInformes\", String(_j.token));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"informes\",\n  \"password\": \"info123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Login analista de ensayos 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Devuelve token Bearer\", function () { var j = pm.response.json(); pm.expect(j.token).to.be.a(\"string\"); pm.expect(j.tipo).to.eql(\"Bearer\"); });",
+                  "var _j = pm.response.json();",
+                  "pm.collectionVariables.set(\"tokenEnsayos1\", String(_j.token));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"ensayos1\",\n  \"password\": \"ens123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Login analista de ensayos 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Devuelve token Bearer\", function () { var j = pm.response.json(); pm.expect(j.token).to.be.a(\"string\"); pm.expect(j.tipo).to.eql(\"Bearer\"); });",
+                  "var _j = pm.response.json();",
+                  "pm.collectionVariables.set(\"tokenEnsayos2\", String(_j.token));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"ensayos2\",\n  \"password\": \"ens123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Login gerente técnico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Devuelve token Bearer\", function () { var j = pm.response.json(); pm.expect(j.token).to.be.a(\"string\"); pm.expect(j.tipo).to.eql(\"Bearer\"); });",
+                  "var _j = pm.response.json();",
+                  "pm.collectionVariables.set(\"tokenGerente\", String(_j.token));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"gerente\",\n  \"password\": \"ger123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Login con clave incorrecta (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"NO_AUTENTICADO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"admin\",\n  \"password\": \"mala\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Login sin datos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"SOLICITUD_INVALIDA\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Usuario autenticado (me)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"rol = coordinador\", function () { pm.expect(pm.response.json().rol).to.eql(\"coordinador\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consultar sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"NO_AUTENTICADO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Usuarios",
+      "item": [
+        {
+          "name": "Listar analistas de ensayos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Lista con al menos 2 analistas\", function () { var j = pm.response.json(); pm.expect(j).to.be.an(\"array\"); pm.expect(j.length).to.be.at.least(2); });",
+                  "var _j = pm.response.json();",
+                  "pm.collectionVariables.set(\"analistaId\", String(_j.find(function (u) { return u.usuario === \"ensayos1\"; }).id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios?rol=analista_ensayos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ],
+              "query": [
+                {
+                  "key": "rol",
+                  "value": "analista_ensayos"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar usuarios sin permiso (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"PROHIBIDO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenGerente}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear usuario (admin)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('nuevoUsuario', 'pm' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"No expone la contraseña\", function () { pm.expect(pm.response.json()).to.not.have.property(\"password_hash\"); });",
+                  "var _j = pm.response.json();",
+                  "pm.collectionVariables.set(\"usuarioNuevoId\", String(_j.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario de Prueba Postman\",\n  \"usuario\": \"{{nuevoUsuario}}\",\n  \"password\": \"clave123\",\n  \"rol\": \"analista_ensayos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear usuario duplicado (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 409\", function () { pm.response.to.have.status(409); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"USUARIO_DUPLICADO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Duplicado\",\n  \"usuario\": \"{{nuevoUsuario}}\",\n  \"password\": \"clave123\",\n  \"rol\": \"analista_ensayos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear usuario con datos inválidos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"SOLICITUD_INVALIDA\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"X\",\n  \"usuario\": \"ab\",\n  \"password\": \"123\",\n  \"rol\": \"rol_inexistente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear usuario sin ser admin (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"PROHIBIDO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"X\",\n  \"usuario\": \"xxx\",\n  \"password\": \"123456\",\n  \"rol\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consultar usuario por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Es el usuario creado\", function () { pm.expect(pm.response.json().usuario).to.eql(pm.collectionVariables.get(\"nuevoUsuario\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioNuevoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioNuevoId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Nombre actualizado\", function () { pm.expect(pm.response.json().nombre).to.eql(\"Usuario Postman Actualizado\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioNuevoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioNuevoId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario Postman Actualizado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Desactivar usuario (baja lógica)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Queda inactivo\", function () { pm.expect(pm.response.json().activo).to.eql(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioNuevoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioNuevoId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consultar usuario inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"NO_ENCONTRADO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "99999"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Programación (ODT)",
+      "item": [
+        {
+          "name": "Programar ODT – Geometría y tensión",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var raw = pm.request.body.raw.replace(/\"responsable_id\":\\s*\"[^\"]*\"/, '\"responsable_id\": ' + pm.collectionVariables.get('analistaId')); pm.request.body.update(raw);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Estado PROGRAMADA y 2 barras\", function () { var j = pm.response.json(); pm.expect(j.estado).to.eql(\"PROGRAMADA\"); pm.expect(j.barras.length).to.eql(2); pm.expect(j.numero_odt).to.match(/^ODT-\\d{4}-\\d{4}$/); });",
+                  "var _j = pm.response.json();",
+                  "pm.collectionVariables.set(\"odtId\", String(_j.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_obra\": \"OB-1045\",\n  \"fecha_recepcion\": \"2026-10-01\",\n  \"procedencia\": \"Bogotá – Planta Norte\",\n  \"fecha_programacion\": \"2026-10-02\",\n  \"num_barras\": 2,\n  \"numeros_barra\": [\n    101,\n    102\n  ],\n  \"ensayo\": \"Geometría y tensión\",\n  \"responsable_id\": \"{{analistaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Programar ODT con 9 barras (400)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var raw = pm.request.body.raw.replace(/\"responsable_id\":\\s*\"[^\"]*\"/, '\"responsable_id\": ' + pm.collectionVariables.get('analistaId')); pm.request.body.update(raw);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"SOLICITUD_INVALIDA\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_obra\": \"OB-1045\",\n  \"fecha_recepcion\": \"2026-10-01\",\n  \"procedencia\": \"Bogotá – Planta Norte\",\n  \"fecha_programacion\": \"2026-10-02\",\n  \"num_barras\": 9,\n  \"ensayo\": \"Geometría y tensión\",\n  \"responsable_id\": \"{{analistaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Programar ODT sin ser coordinador/informes (403)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var raw = pm.request.body.raw.replace(/\"responsable_id\":\\s*\"[^\"]*\"/, '\"responsable_id\": ' + pm.collectionVariables.get('analistaId')); pm.request.body.update(raw);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"PROHIBIDO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_obra\": \"OB-1045\",\n  \"fecha_recepcion\": \"2026-10-01\",\n  \"procedencia\": \"Bogotá – Planta Norte\",\n  \"fecha_programacion\": \"2026-10-02\",\n  \"num_barras\": 2,\n  \"numeros_barra\": [\n    101,\n    102\n  ],\n  \"ensayo\": \"Geometría y tensión\",\n  \"responsable_id\": \"{{analistaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos1}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Programar ODT sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"NO_AUTENTICADO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_obra\": \"OB-1045\",\n  \"fecha_recepcion\": \"2026-10-01\",\n  \"procedencia\": \"Bogotá – Planta Norte\",\n  \"fecha_programacion\": \"2026-10-02\",\n  \"num_barras\": 2,\n  \"numeros_barra\": [\n    101,\n    102\n  ],\n  \"ensayo\": \"Geometría y tensión\",\n  \"responsable_id\": \"{{analistaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Programar ODT – solo Geometría (analista de informes)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var raw = pm.request.body.raw.replace(/\"responsable_id\":\\s*\"[^\"]*\"/, '\"responsable_id\": ' + pm.collectionVariables.get('analistaId')); pm.request.body.update(raw);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "var _j = pm.response.json();",
+                  "pm.collectionVariables.set(\"odtGeoId\", String(_j.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_obra\": \"OB-2200\",\n  \"fecha_recepcion\": \"2026-10-01\",\n  \"procedencia\": \"Bogotá – Planta Norte\",\n  \"fecha_programacion\": \"2026-10-02\",\n  \"num_barras\": 1,\n  \"numeros_barra\": [\n    57\n  ],\n  \"ensayo\": \"Geometría\",\n  \"responsable_id\": \"{{analistaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenInformes}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar ODT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Es un arreglo con ODT\", function () { pm.expect(pm.response.json().length).to.be.at.least(2); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar ODT filtrando por estado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Todas PROGRAMADA\", function () { pm.response.json().forEach(function (o) { pm.expect(o.estado).to.eql(\"PROGRAMADA\"); }); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt?estado=PROGRAMADA&codigo_obra=OB-1045",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "PROGRAMADA"
+                },
+                {
+                  "key": "codigo_obra",
+                  "value": "OB-1045"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Bandeja de pendientes (analista de ensayos 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Incluye la ODT asignada\", function () { var id = Number(pm.collectionVariables.get(\"odtId\")); pm.expect(pm.response.json().some(function (o) { return o.id === id; })).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/pendientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "pendientes"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos1}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Bandeja de pendientes (analista de ensayos 2 – vacía)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"No ve ODT de otro analista\", function () { pm.expect(pm.response.json().length).to.eql(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/pendientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "pendientes"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos2}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detalle de ODT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Incluye barras con cálculos\", function () { var j = pm.response.json(); pm.expect(j.barras[0]).to.have.property(\"calculos\"); pm.expect(j.barras[0].numero_barra).to.eql(101); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detalle de ODT asignada a otro analista (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"PROHIBIDO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos2}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detalle de ODT inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"NO_ENCONTRADO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "99999"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Modificar programación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Fecha actualizada\", function () { pm.expect(pm.response.json().fecha_programacion).to.eql(\"2026-10-05\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha_programacion\": \"2026-10-05\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Programar ODT temporal para eliminar",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var raw = pm.request.body.raw.replace(/\"responsable_id\":\\s*\"[^\"]*\"/, '\"responsable_id\": ' + pm.collectionVariables.get('analistaId')); pm.request.body.update(raw);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "var _j = pm.response.json();",
+                  "pm.collectionVariables.set(\"odtTmpId\", String(_j.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_obra\": \"OB-TEMP\",\n  \"fecha_recepcion\": \"2026-10-01\",\n  \"procedencia\": \"Bogotá – Planta Norte\",\n  \"fecha_programacion\": \"2026-10-02\",\n  \"num_barras\": 1,\n  \"numeros_barra\": [\n    1\n  ],\n  \"ensayo\": \"Geometría y tensión\",\n  \"responsable_id\": \"{{analistaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar ODT en estado PROGRAMADA",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 204\", function () { pm.response.to.have.status(204); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtTmpId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtTmpId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consultar ODT eliminada (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"NO_ENCONTRADO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtTmpId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtTmpId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Historial de observaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Es un arreglo\", function () { pm.expect(pm.response.json()).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/observaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "observaciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCoordinador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Ejecución del ensayo",
+      "item": [
+        {
+          "name": "Guardado parcial (Sección 1 incompleta)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Guarda solo lo enviado\", function () { var b = pm.response.json().barras[0]; pm.expect(b.diametro).to.eql(12); pm.expect(b.masa_g).to.eql(null); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/ejecucion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "ejecucion"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barras\": [\n    {\n      \"numero_barra\": 101,\n      \"descripcion\": \"Parcial\",\n      \"diametro\": 12\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos1}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Guardar con analista no asignado (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"PROHIBIDO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/ejecucion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "ejecucion"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barras\": [\n    {\n      \"numero_barra\": 101,\n      \"descripcion\": \"Barra corrugada\",\n      \"diametro\": 12,\n      \"longitud_cm\": 50,\n      \"masa_g\": 444,\n      \"espaciamiento_resaltes_s\": 8,\n      \"longitud_resaltes_cm\": 8.4,\n      \"numero_resaltes\": 10,\n      \"altura_resaltes\": {\n        \"A\": {\n          \"r1\": [\n            1,\n            1.1,\n            1.2\n          ],\n          \"r2\": [\n            1.1,\n            1.2,\n            1.3\n          ]\n        },\n        \"B\": {\n          \"r1\": [\n            1.2,\n            1.3,\n            1.4\n          ],\n          \"r2\": [\n            1.3,\n            1.4,\n            1.5\n          ]\n        }\n      },\n      \"ancho_vena\": {\n        \"v1\": [\n          2,\n          2.1,\n          2.2\n        ],\n        \"v2\": [\n          2.1,\n          2.2,\n          2.3\n        ]\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos2}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Guardar con solo 2 mediciones (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"SOLICITUD_INVALIDA\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/ejecucion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "ejecucion"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barras\": [\n    {\n      \"numero_barra\": 101,\n      \"ancho_vena\": {\n        \"v1\": [\n          1,\n          2\n        ]\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos1}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Enviar ensayo incompleto (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 422\", function () { pm.response.to.have.status(422); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"ENSAYO_INCOMPLETO\"); });",
+                  "pm.test(\"Lista campos faltantes\", function () { pm.expect(pm.response.json().error.detalles.length).to.be.above(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/ejecucion/enviar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "ejecucion",
+                "enviar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos1}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Guardar ensayo completo (2 barras)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Altura promedio h calculada = 1.25\", function () { pm.expect(pm.response.json().barras[0].calculos.altura_promedio_h_mm).to.eql(1.25); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/ejecucion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "ejecucion"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barras\": [\n    {\n      \"numero_barra\": 101,\n      \"descripcion\": \"Barra corrugada\",\n      \"diametro\": 12,\n      \"longitud_cm\": 50,\n      \"masa_g\": 444,\n      \"espaciamiento_resaltes_s\": 8,\n      \"longitud_resaltes_cm\": 8.4,\n      \"numero_resaltes\": 10,\n      \"altura_resaltes\": {\n        \"A\": {\n          \"r1\": [\n            1,\n            1.1,\n            1.2\n          ],\n          \"r2\": [\n            1.1,\n            1.2,\n            1.3\n          ]\n        },\n        \"B\": {\n          \"r1\": [\n            1.2,\n            1.3,\n            1.4\n          ],\n          \"r2\": [\n            1.3,\n            1.4,\n            1.5\n          ]\n        }\n      },\n      \"ancho_vena\": {\n        \"v1\": [\n          2,\n          2.1,\n          2.2\n        ],\n        \"v2\": [\n          2.1,\n          2.2,\n          2.3\n        ]\n      }\n    },\n    {\n      \"numero_barra\": 102,\n      \"descripcion\": \"Barra corrugada\",\n      \"diametro\": 12,\n      \"longitud_cm\": 50,\n      \"masa_g\": 444,\n      \"espaciamiento_resaltes_s\": 8,\n      \"longitud_resaltes_cm\": 8.4,\n      \"numero_resaltes\": 10,\n      \"altura_resaltes\": {\n        \"A\": {\n          \"r1\": [\n            1,\n            1.1,\n            1.2\n          ],\n          \"r2\": [\n            1.1,\n            1.2,\n            1.3\n          ]\n        },\n        \"B\": {\n          \"r1\": [\n            1.2,\n            1.3,\n            1.4\n          ],\n          \"r2\": [\n            1.3,\n            1.4,\n            1.5\n          ]\n        }\n      },\n      \"ancho_vena\": {\n        \"v1\": [\n          2,\n          2.1,\n          2.2\n        ],\n        \"v2\": [\n          2.1,\n          2.2,\n          2.3\n        ]\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos1}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Enviar ensayo al gerente técnico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Estado PENDIENTE_FUERZAS\", function () { pm.expect(pm.response.json().estado).to.eql(\"PENDIENTE_FUERZAS\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/ejecucion/enviar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "ejecucion",
+                "enviar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos1}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Editar tras enviar (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 409\", function () { pm.response.to.have.status(409); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"ESTADO_INVALIDO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/ejecucion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "ejecucion"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barras\": [\n    {\n      \"numero_barra\": 101,\n      \"descripcion\": \"Barra corrugada\",\n      \"diametro\": 12,\n      \"longitud_cm\": 50,\n      \"masa_g\": 444,\n      \"espaciamiento_resaltes_s\": 8,\n      \"longitud_resaltes_cm\": 8.4,\n      \"numero_resaltes\": 10,\n      \"altura_resaltes\": {\n        \"A\": {\n          \"r1\": [\n            1,\n            1.1,\n            1.2\n          ],\n          \"r2\": [\n            1.1,\n            1.2,\n            1.3\n          ]\n        },\n        \"B\": {\n          \"r1\": [\n            1.2,\n            1.3,\n            1.4\n          ],\n          \"r2\": [\n            1.3,\n            1.4,\n            1.5\n          ]\n        }\n      },\n      \"ancho_vena\": {\n        \"v1\": [\n          2,\n          2.1,\n          2.2\n        ],\n        \"v2\": [\n          2.1,\n          2.2,\n          2.3\n        ]\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos1}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Registro de fuerzas",
+      "item": [
+        {
+          "name": "Bandeja del gerente técnico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Incluye la ODT\", function () { var id = Number(pm.collectionVariables.get(\"odtId\")); pm.expect(pm.response.json().some(function (o) { return o.id === id; })).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/pendientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "pendientes"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenGerente}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Enviar fuerzas incompletas (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 422\", function () { pm.response.to.have.status(422); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"FUERZAS_INCOMPLETAS\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/fuerzas/enviar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "fuerzas",
+                "enviar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenGerente}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Fuerza máxima menor que fluencia (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"SOLICITUD_INVALIDA\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/fuerzas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "fuerzas"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barras\": [\n    {\n      \"numero_barra\": 101,\n      \"fuerza_fluencia_kn\": 60,\n      \"fuerza_maxima_kn\": 50\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenGerente}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar fuerzas con rol incorrecto (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"PROHIBIDO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/fuerzas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "fuerzas"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barras\": [\n    {\n      \"numero_barra\": 101,\n      \"fuerza_fluencia_kn\": 50,\n      \"fuerza_maxima_kn\": 62\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos1}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Observación del gerente (devuelve a ejecución)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Vuelve a PROGRAMADA con la observación\", function () { var j = pm.response.json(); pm.expect(j.estado).to.eql(\"PROGRAMADA\"); pm.expect(j.observaciones.length).to.be.at.least(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/fuerzas/observaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "fuerzas",
+                "observaciones"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Verificar la masa de la barra 102, parece inconsistente.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenGerente}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Analista corrige y reenvía el ensayo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Estado PENDIENTE_FUERZAS\", function () { pm.expect(pm.response.json().estado).to.eql(\"PENDIENTE_FUERZAS\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/ejecucion/enviar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "ejecucion",
+                "enviar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos1}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Guardar fuerzas (kN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Fuerzas guardadas\", function () { pm.expect(pm.response.json().barras[0].fuerza_maxima_kn).to.eql(62.5); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/fuerzas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "fuerzas"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barras\": [\n    {\n      \"numero_barra\": 101,\n      \"fuerza_fluencia_kn\": 50.2,\n      \"fuerza_maxima_kn\": 62.5\n    },\n    {\n      \"numero_barra\": 102,\n      \"fuerza_fluencia_kn\": 51,\n      \"fuerza_maxima_kn\": 63.1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenGerente}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Enviar fuerzas a revisión de informe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Estado EN_REVISION\", function () { pm.expect(pm.response.json().estado).to.eql(\"EN_REVISION\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtId}}/fuerzas/enviar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtId}}",
+                "fuerzas",
+                "enviar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenGerente}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Revisión de informes",
+      "item": [
+        {
+          "name": "ODT pendientes de consecutivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Incluye la ODT\", function () { var id = Number(pm.collectionVariables.get(\"odtId\")); pm.expect(pm.response.json().some(function (o) { return o.id === id; })).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes/pendientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "pendientes"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenInformes}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Vista preliminar del informe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Trae barras con fuerzas\", function () { pm.expect(pm.response.json().barras[0].fuerza_fluencia_kn).to.eql(50.2); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes/{{odtId}}/preliminar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "{{odtId}}",
+                "preliminar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenInformes}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Generar consecutivo con rol incorrecto (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"PROHIBIDO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes/{{odtId}}/consecutivo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "{{odtId}}",
+                "consecutivo"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenGerente}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Generar consecutivo, PDF y consolidado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Consecutivo ENS-0000 y estado INFORME_PRELIMINAR\", function () { var j = pm.response.json(); pm.expect(j.estado).to.eql(\"INFORME_PRELIMINAR\"); pm.expect(j.codigo_informe).to.match(/^ENS-\\d{4}$/); });",
+                  "pm.test(\"Nombre del PDF con el formato requerido\", function () { pm.expect(pm.response.json().archivo_pdf).to.match(/^OB-1045_ENS_\\d{4}_Preliminar\\.pdf$/); });",
+                  "var _j = pm.response.json();",
+                  "pm.collectionVariables.set(\"consecutivo1\", String(_j.consecutivo));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes/{{odtId}}/consecutivo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "{{odtId}}",
+                "consecutivo"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenInformes}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Generar consecutivo repetido (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 409\", function () { pm.response.to.have.status(409); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Formato de error estándar\", function () { pm.expect(pm.response.json().error.codigo).to.eql(\"ESTADO_INVALIDO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes/{{odtId}}/consecutivo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "{{odtId}}",
+                "consecutivo"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenInformes}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar informes emitidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Hay al menos un informe\", function () { pm.expect(pm.response.json().length).to.be.at.least(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenInformes}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Descargar PDF preliminar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Content-Type PDF\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"pdf\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes/{{odtId}}/pdf",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "{{odtId}}",
+                "pdf"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenInformes}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Descargar consolidado Excel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Content-Type Excel\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"spreadsheetml\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes/consolidado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "consolidado"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenInformes}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Flujo sin tensión (Geometría)",
+      "item": [
+        {
+          "name": "Guardar ensayo completo (1 barra)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtGeoId}}/ejecucion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtGeoId}}",
+                "ejecucion"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barras\": [\n    {\n      \"numero_barra\": 57,\n      \"descripcion\": \"Barra corrugada\",\n      \"diametro\": 12,\n      \"longitud_cm\": 50,\n      \"masa_g\": 444,\n      \"espaciamiento_resaltes_s\": 8,\n      \"longitud_resaltes_cm\": 8.4,\n      \"numero_resaltes\": 10,\n      \"altura_resaltes\": {\n        \"A\": {\n          \"r1\": [\n            1,\n            1.1,\n            1.2\n          ],\n          \"r2\": [\n            1.1,\n            1.2,\n            1.3\n          ]\n        },\n        \"B\": {\n          \"r1\": [\n            1.2,\n            1.3,\n            1.4\n          ],\n          \"r2\": [\n            1.3,\n            1.4,\n            1.5\n          ]\n        }\n      },\n      \"ancho_vena\": {\n        \"v1\": [\n          2,\n          2.1,\n          2.2\n        ],\n        \"v2\": [\n          2.1,\n          2.2,\n          2.3\n        ]\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos1}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Enviar ensayo – omite al gerente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Pasa directo a EN_REVISION\", function () { pm.expect(pm.response.json().estado).to.eql(\"EN_REVISION\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtGeoId}}/ejecucion/enviar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtGeoId}}",
+                "ejecucion",
+                "enviar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos1}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Observación del analista de informes (devuelve)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Vuelve a PROGRAMADA\", function () { pm.expect(pm.response.json().estado).to.eql(\"PROGRAMADA\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/informes/{{odtGeoId}}/observaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "{{odtGeoId}}",
+                "observaciones"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Falta confirmar la descripción de la barra 57.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenInformes}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Analista reenvía el ensayo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Estado EN_REVISION\", function () { pm.expect(pm.response.json().estado).to.eql(\"EN_REVISION\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{odtGeoId}}/ejecucion/enviar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{odtGeoId}}",
+                "ejecucion",
+                "enviar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEnsayos1}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Generar consecutivo (segundo informe)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Tiempo de respuesta < 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Respuesta en formato JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Consecutivo mayor que el primero\", function () { pm.expect(pm.response.json().consecutivo).to.be.above(Number(pm.collectionVariables.get(\"consecutivo1\"))); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes/{{odtGeoId}}/consecutivo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "{{odtGeoId}}",
+                "consecutivo"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenInformes}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

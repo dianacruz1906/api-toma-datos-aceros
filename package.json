@@ -7,7 +7,8 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "seed": "node src/db/seed.js",
-    "test": "node --test"
+    "test": "node --test",
+    "test:postman": "newman run docs/postman/API_Aceros.postman_collection.json -e docs/postman/Local.postman_environment.json"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +29,8 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "newman": "^6.2.3",
+    "newman-reporter-htmlextra": "^1.23.1",
     "supertest": "^7.3.1"
   }
 }
