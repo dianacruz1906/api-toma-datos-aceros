@@ -1,0 +1,632 @@
+{
+  "info": {
+    "name": "API Toma de datos – Ensayos de aceros",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Ejecute primero Autenticación > Inicio de sesión; el token se guarda automáticamente."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "id",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Sistema",
+      "item": [
+        {
+          "name": "Estado del servicio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Autenticación",
+      "item": [
+        {
+          "name": "Inicio de sesión (usuario y clave)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"coordinador\",\n  \"password\": \"coord123\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"token\", pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Datos del usuario autenticado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Listar usuarios (roles coordinador, analista_informes)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear usuario (solo admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Laura Gómez\",\n  \"usuario\": \"lgomez\",\n  \"password\": \"clave123\",\n  \"rol\": \"analista_ensayos\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Consultar usuario (solo admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar usuario (solo admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Laura Gómez R.\",\n  \"activo\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Desactivar usuario – baja lógica (solo admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Programación (ODT)",
+      "item": [
+        {
+          "name": "Listar ODT",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Programar ODT (coordinador, analista_informes)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_obra\": \"OB-1045\",\n  \"fecha_recepcion\": \"2026-10-01\",\n  \"procedencia\": \"Bogotá – Planta Siderúrgica Norte\",\n  \"fecha_programacion\": \"2026-10-02\",\n  \"num_barras\": 3,\n  \"numeros_barra\": [\n    101,\n    102,\n    103\n  ],\n  \"ensayo\": \"Geometría y tensión\",\n  \"responsable_id\": 4\n}"
+            }
+          }
+        },
+        {
+          "name": "Bandeja de actividades pendientes del usuario según su rol",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/pendientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "pendientes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detalle de una ODT (barras, mediciones, cálculos y observaciones)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Modificar programación (solo en estado PROGRAMADA)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"responsable_id\": 5,\n  \"fecha_programacion\": \"2026-10-03\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar ODT (solo en estado PROGRAMADA)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Historial de observaciones de la ODT",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{id}}/observaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{id}}",
+                "observaciones"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ejecución del ensayo",
+      "item": [
+        {
+          "name": "Guardar datos del ensayo – guardado temporal (analista asignado)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{id}}/ejecucion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{id}}",
+                "ejecucion"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barras\": [\n    {\n      \"numero_barra\": 101,\n      \"descripcion\": \"Barra corrugada\",\n      \"diametro\": 12,\n      \"longitud_cm\": 50,\n      \"masa_g\": 444,\n      \"espaciamiento_resaltes_s\": 8,\n      \"longitud_resaltes_cm\": 8.4,\n      \"numero_resaltes\": 10,\n      \"altura_resaltes\": {\n        \"A\": {\n          \"r1\": [\n            1,\n            1.1,\n            1.2\n          ],\n          \"r2\": [\n            1.1,\n            1.2,\n            1.3\n          ]\n        },\n        \"B\": {\n          \"r1\": [\n            1.2,\n            1.3,\n            1.4\n          ],\n          \"r2\": [\n            1.3,\n            1.4,\n            1.5\n          ]\n        }\n      },\n      \"ancho_vena\": {\n        \"v1\": [\n          2,\n          2.1,\n          2.2\n        ],\n        \"v2\": [\n          2.1,\n          2.2,\n          2.3\n        ]\n      }\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Enviar el ensayo (avanza el flujo)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{id}}/ejecucion/enviar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{id}}",
+                "ejecucion",
+                "enviar"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registro de fuerzas",
+      "item": [
+        {
+          "name": "Guardar fuerzas de fluencia y máxima en kN (gerente técnico)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{id}}/fuerzas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{id}}",
+                "fuerzas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barras\": [\n    {\n      \"numero_barra\": 101,\n      \"fuerza_fluencia_kn\": 50.2,\n      \"fuerza_maxima_kn\": 62.5\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Enviar observación – devuelve la ODT a Ejecución de ensayos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{id}}/fuerzas/observaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{id}}",
+                "fuerzas",
+                "observaciones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Verificar la masa de la barra 102\",\n  \"parece inconsistente.\": null\n}"
+            }
+          }
+        },
+        {
+          "name": "Enviar fuerzas – avanza a revisión de informe",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/odt/{{id}}/fuerzas/enviar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odt",
+                "{{id}}",
+                "fuerzas",
+                "enviar"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Revisión de informes",
+      "item": [
+        {
+          "name": "ODT pendientes de asignar consecutivo (analista_informes)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes/pendientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "pendientes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Informes preliminares ya emitidos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Vista preliminar del informe (datos y cálculos)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes/{{id}}/preliminar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "{{id}}",
+                "preliminar"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar hallazgos y devolver al analista de ensayos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/informes/{{id}}/observaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "{{id}}",
+                "observaciones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Falta descripción coherente en la barra 103.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Generar consecutivo, PDF preliminar y actualizar consolidado Excel",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes/{{id}}/consecutivo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "{{id}}",
+                "consecutivo"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Descargar PDF preliminar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes/{{id}}/pdf",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "{{id}}",
+                "pdf"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Descargar consolidado de ensayos en Excel",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/informes/consolidado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "informes",
+                "consolidado"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

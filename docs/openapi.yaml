@@ -1,1 +1,493 @@
-# placeholder
+openapi: 3.0.3
+info:
+  title: API Programa de mejoramiento de toma de datos – Ensayos de aceros
+  version: 1.0.0
+  description: |
+    API REST para digitalizar el flujo de ensayos de barras de acero del laboratorio (INGEYMA LTDA):
+    **Programación (ODT) → Ejecución del ensayo → Registro de fuerzas → Revisión de informes y consecutivo**.
+
+    ### Autenticación
+    Todos los servicios (excepto `POST /auth/login`) requieren `Authorization: Bearer <token>`.
+
+    ### Roles
+    `admin`, `coordinador`, `analista_informes`, `analista_ensayos`, `gerente_tecnico`.
+    El rol `admin` puede ejecutar cualquier servicio protegido por rol.
+
+    ### Flujo de estados de una ODT
+    `PROGRAMADA` → (analista envía) → `PENDIENTE_FUERZAS` → (gerente envía) → `EN_REVISION` → (consecutivo) → `INFORME_PRELIMINAR`.
+    Si el ensayo no incluye tensión (Geometría, Doblado) se omite el paso del gerente.
+    Una **observación** del gerente o del analista de informes devuelve la ODT a `PROGRAMADA` (Ejecución de ensayos).
+
+    ### Errores
+    Formato único: `{"error": {"codigo": "...", "mensaje": "...", "detalles": [...]}}`.
+servers:
+  - url: http://localhost:3000/api
+tags:
+  - name: Autenticación
+  - name: Usuarios
+  - name: Programación (ODT)
+  - name: Ejecución del ensayo
+  - name: Registro de fuerzas
+  - name: Revisión de informes
+  - name: Sistema
+security:
+  - bearerAuth: []
+paths:
+  /health:
+    get:
+      tags: [Sistema]
+      summary: Estado del servicio
+      security: []
+      responses:
+        '200': { description: Servicio activo, content: { application/json: { example: { estado: ok, servicio: api-toma-datos-aceros } } } }
+
+  /auth/login:
+    post:
+      tags: [Autenticación]
+      summary: Inicio de sesión (usuario y clave)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+            example: { usuario: coordinador, password: coord123 }
+      responses:
+        '200':
+          description: Token JWT
+          content: { application/json: { schema: { $ref: '#/components/schemas/LoginResponse' } } }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+  /auth/me:
+    get:
+      tags: [Autenticación]
+      summary: Datos del usuario autenticado
+      responses:
+        '200': { description: Usuario actual, content: { application/json: { schema: { $ref: '#/components/schemas/Usuario' } } } }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+
+  /usuarios:
+    get:
+      tags: [Usuarios]
+      summary: Listar usuarios (roles coordinador, analista_informes)
+      description: Con `?rol=analista_ensayos` devuelve solo los activos de ese rol (útil para asignar responsable).
+      parameters:
+        - { name: rol, in: query, schema: { $ref: '#/components/schemas/Rol' } }
+      responses:
+        '200': { description: Lista, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Usuario' } } } } }
+        '403': { $ref: '#/components/responses/Prohibido' }
+    post:
+      tags: [Usuarios]
+      summary: Crear usuario (solo admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UsuarioCrear' }
+            example: { nombre: Laura Gómez, usuario: lgomez, password: clave123, rol: analista_ensayos }
+      responses:
+        '201': { description: Creado, content: { application/json: { schema: { $ref: '#/components/schemas/Usuario' } } } }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '403': { $ref: '#/components/responses/Prohibido' }
+        '409': { description: El usuario ya existe }
+  /usuarios/{id}:
+    parameters: [ { $ref: '#/components/parameters/Id' } ]
+    get:
+      tags: [Usuarios]
+      summary: Consultar usuario (solo admin)
+      responses:
+        '200': { description: Usuario, content: { application/json: { schema: { $ref: '#/components/schemas/Usuario' } } } }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Usuarios]
+      summary: Actualizar usuario (solo admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example: { nombre: Laura Gómez R., activo: true }
+      responses:
+        '200': { description: Actualizado, content: { application/json: { schema: { $ref: '#/components/schemas/Usuario' } } } }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    delete:
+      tags: [Usuarios]
+      summary: Desactivar usuario – baja lógica (solo admin)
+      responses:
+        '200': { description: Usuario desactivado }
+        '409': { description: No puede desactivarse a sí mismo }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /odt:
+    get:
+      tags: [Programación (ODT)]
+      summary: Listar ODT
+      description: Un analista de ensayos solo ve las ODT que tiene asignadas.
+      parameters:
+        - { name: estado, in: query, schema: { $ref: '#/components/schemas/Estado' } }
+        - { name: codigo_obra, in: query, schema: { type: string } }
+        - { name: ensayo, in: query, schema: { $ref: '#/components/schemas/Ensayo' } }
+        - { name: responsable_id, in: query, schema: { type: integer } }
+      responses:
+        '200': { description: Lista, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Odt' } } } } }
+    post:
+      tags: [Programación (ODT)]
+      summary: Programar ODT (coordinador, analista_informes)
+      description: |
+        Registra los datos de la remisión del cliente y los datos internos. Crea automáticamente una barra por cada
+        unidad recibida. Si no se envía `numero_odt` se genera (`ODT-AAAA-0001`).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OdtCrear' }
+            example:
+              codigo_obra: OB-1045
+              fecha_recepcion: '2026-10-01'
+              procedencia: Bogotá – Planta Siderúrgica Norte
+              fecha_programacion: '2026-10-02'
+              num_barras: 3
+              numeros_barra: [101, 102, 103]
+              ensayo: Geometría y tensión
+              responsable_id: 4
+      responses:
+        '201': { description: ODT creada, content: { application/json: { schema: { $ref: '#/components/schemas/OdtDetalle' } } } }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '403': { $ref: '#/components/responses/Prohibido' }
+        '409': { description: Número de ODT duplicado }
+  /odt/pendientes:
+    get:
+      tags: [Programación (ODT)]
+      summary: Bandeja de actividades pendientes del usuario según su rol
+      description: |
+        - analista_ensayos → sus ODT en `PROGRAMADA`
+        - gerente_tecnico → ODT en `PENDIENTE_FUERZAS`
+        - analista_informes → ODT en `EN_REVISION`
+      responses:
+        '200': { description: Lista, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Odt' } } } } }
+  /odt/{id}:
+    parameters: [ { $ref: '#/components/parameters/Id' } ]
+    get:
+      tags: [Programación (ODT)]
+      summary: Detalle de una ODT (barras, mediciones, cálculos y observaciones)
+      responses:
+        '200': { description: Detalle, content: { application/json: { schema: { $ref: '#/components/schemas/OdtDetalle' } } } }
+        '403': { $ref: '#/components/responses/Prohibido' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Programación (ODT)]
+      summary: Modificar programación (solo en estado PROGRAMADA)
+      requestBody:
+        required: true
+        content: { application/json: { example: { responsable_id: 5, fecha_programacion: '2026-10-03' } } }
+      responses:
+        '200': { description: ODT actualizada, content: { application/json: { schema: { $ref: '#/components/schemas/OdtDetalle' } } } }
+        '409': { description: Estado inválido o hay datos registrados }
+    delete:
+      tags: [Programación (ODT)]
+      summary: Eliminar ODT (solo en estado PROGRAMADA)
+      responses:
+        '204': { description: Eliminada }
+        '409': { description: Estado inválido }
+  /odt/{id}/observaciones:
+    parameters: [ { $ref: '#/components/parameters/Id' } ]
+    get:
+      tags: [Programación (ODT)]
+      summary: Historial de observaciones de la ODT
+      responses:
+        '200': { description: Lista, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Observacion' } } } } }
+
+  /odt/{id}/ejecucion:
+    parameters: [ { $ref: '#/components/parameters/Id' } ]
+    put:
+      tags: [Ejecución del ensayo]
+      summary: Guardar datos del ensayo – guardado temporal (analista asignado)
+      description: |
+        Registra las tres secciones por barra. Admite guardado **parcial**: solo se actualizan los campos enviados.
+        Cada grupo de mediciones requiere exactamente 3 valores (mm). Solo con la ODT en `PROGRAMADA`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EjecucionRequest' }
+            example:
+              barras:
+                - numero_barra: 101
+                  descripcion: Barra corrugada
+                  diametro: 12
+                  longitud_cm: 50
+                  masa_g: 444
+                  espaciamiento_resaltes_s: 8
+                  longitud_resaltes_cm: 8.4
+                  numero_resaltes: 10
+                  altura_resaltes:
+                    A: { r1: [1.0, 1.1, 1.2], r2: [1.1, 1.2, 1.3] }
+                    B: { r1: [1.2, 1.3, 1.4], r2: [1.3, 1.4, 1.5] }
+                  ancho_vena: { v1: [2.0, 2.1, 2.2], v2: [2.1, 2.2, 2.3] }
+      responses:
+        '200': { description: Guardado, content: { application/json: { schema: { $ref: '#/components/schemas/OdtDetalle' } } } }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '403': { $ref: '#/components/responses/Prohibido' }
+        '409': { description: La ODT no está en PROGRAMADA }
+  /odt/{id}/ejecucion/enviar:
+    parameters: [ { $ref: '#/components/parameters/Id' } ]
+    post:
+      tags: [Ejecución del ensayo]
+      summary: Enviar el ensayo (avanza el flujo)
+      description: |
+        Valida que todas las barras estén completas (Sección 1 siempre; secciones 2 y 3 y espaciamiento si el ensayo incluye Geometría).
+        Con tensión → `PENDIENTE_FUERZAS`; sin tensión → `EN_REVISION`.
+      responses:
+        '200': { description: Enviado, content: { application/json: { schema: { $ref: '#/components/schemas/OdtDetalle' } } } }
+        '422': { description: Ensayo incompleto; `detalles` lista los campos faltantes }
+
+  /odt/{id}/fuerzas:
+    parameters: [ { $ref: '#/components/parameters/Id' } ]
+    put:
+      tags: [Registro de fuerzas]
+      summary: Guardar fuerzas de fluencia y máxima en kN (gerente técnico)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FuerzasRequest' }
+            example:
+              barras:
+                - { numero_barra: 101, fuerza_fluencia_kn: 50.2, fuerza_maxima_kn: 62.5 }
+      responses:
+        '200': { description: Guardado, content: { application/json: { schema: { $ref: '#/components/schemas/OdtDetalle' } } } }
+        '400': { description: Máxima menor que fluencia u otro dato inválido }
+        '409': { description: La ODT no está en PENDIENTE_FUERZAS }
+  /odt/{id}/fuerzas/observaciones:
+    parameters: [ { $ref: '#/components/parameters/Id' } ]
+    post:
+      tags: [Registro de fuerzas]
+      summary: Enviar observación – devuelve la ODT a Ejecución de ensayos
+      requestBody:
+        required: true
+        content: { application/json: { example: { texto: Verificar la masa de la barra 102, parece inconsistente. } } }
+      responses:
+        '200': { description: ODT devuelta (estado PROGRAMADA), content: { application/json: { schema: { $ref: '#/components/schemas/OdtDetalle' } } } }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '409': { description: Estado inválido }
+  /odt/{id}/fuerzas/enviar:
+    parameters: [ { $ref: '#/components/parameters/Id' } ]
+    post:
+      tags: [Registro de fuerzas]
+      summary: Enviar fuerzas – avanza a revisión de informe
+      responses:
+        '200': { description: Estado EN_REVISION, content: { application/json: { schema: { $ref: '#/components/schemas/OdtDetalle' } } } }
+        '422': { description: Faltan fuerzas por registrar }
+
+  /informes/pendientes:
+    get:
+      tags: [Revisión de informes]
+      summary: ODT pendientes de asignar consecutivo (analista_informes)
+      responses:
+        '200': { description: Lista, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Odt' } } } } }
+  /informes:
+    get:
+      tags: [Revisión de informes]
+      summary: Informes preliminares ya emitidos
+      responses:
+        '200': { description: Lista ordenada por consecutivo descendente }
+  /informes/{id}/preliminar:
+    parameters: [ { $ref: '#/components/parameters/Id' } ]
+    get:
+      tags: [Revisión de informes]
+      summary: Vista preliminar del informe (datos y cálculos)
+      responses:
+        '200': { description: Informe, content: { application/json: { schema: { $ref: '#/components/schemas/OdtDetalle' } } } }
+        '409': { description: La ODT aún no está en revisión }
+  /informes/{id}/observaciones:
+    parameters: [ { $ref: '#/components/parameters/Id' } ]
+    post:
+      tags: [Revisión de informes]
+      summary: Registrar hallazgos y devolver al analista de ensayos
+      requestBody:
+        required: true
+        content: { application/json: { example: { texto: Falta descripción coherente en la barra 103. } } }
+      responses:
+        '200': { description: ODT devuelta, content: { application/json: { schema: { $ref: '#/components/schemas/OdtDetalle' } } } }
+  /informes/{id}/consecutivo:
+    parameters: [ { $ref: '#/components/parameters/Id' } ]
+    post:
+      tags: [Revisión de informes]
+      summary: Generar consecutivo, PDF preliminar y actualizar consolidado Excel
+      description: |
+        Consulta el último consecutivo (SharePoint de Gestión de informes), asigna el siguiente (`ENS-0001`),
+        genera `CodigoObra_TipoInforme_Consecutivo_Preliminar.pdf` en la carpeta **Informes preliminares** y
+        regenera el consolidado en Excel.
+      responses:
+        '201':
+          description: Informe generado
+          content:
+            application/json:
+              example: { id: 1, estado: INFORME_PRELIMINAR, consecutivo: 1, codigo_informe: ENS-0001, archivo_pdf: OB-1045_ENS_0001_Preliminar.pdf }
+        '409': { description: La ODT no está en EN_REVISION }
+  /informes/{id}/pdf:
+    parameters: [ { $ref: '#/components/parameters/Id' } ]
+    get:
+      tags: [Revisión de informes]
+      summary: Descargar PDF preliminar
+      responses:
+        '200': { description: Archivo PDF, content: { application/pdf: { schema: { type: string, format: binary } } } }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+  /informes/consolidado:
+    get:
+      tags: [Revisión de informes]
+      summary: Descargar consolidado de ensayos en Excel
+      responses:
+        '200':
+          description: Archivo .xlsx
+          content: { application/vnd.openxmlformats-officedocument.spreadsheetml.sheet: { schema: { type: string, format: binary } } }
+
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: integer }, description: Identificador numérico }
+  responses:
+    Validacion: { description: Datos inválidos, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    NoAutenticado: { description: Token ausente/inválido o credenciales incorrectas, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    Prohibido: { description: El rol no tiene permiso, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    NoEncontrado: { description: Recurso inexistente, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  schemas:
+    Rol: { type: string, enum: [admin, coordinador, analista_informes, analista_ensayos, gerente_tecnico] }
+    Ensayo: { type: string, enum: [Geometría, Tensión, Geometría y tensión, Doblado] }
+    Estado: { type: string, enum: [PROGRAMADA, PENDIENTE_FUERZAS, EN_REVISION, INFORME_PRELIMINAR] }
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            codigo: { type: string, example: SOLICITUD_INVALIDA }
+            mensaje: { type: string }
+            detalles: { type: array, items: {} }
+    LoginRequest:
+      type: object
+      required: [usuario, password]
+      properties: { usuario: { type: string }, password: { type: string } }
+    LoginResponse:
+      type: object
+      properties:
+        token: { type: string }
+        tipo: { type: string, example: Bearer }
+        usuario: { $ref: '#/components/schemas/Usuario' }
+    Usuario:
+      type: object
+      properties:
+        id: { type: integer }
+        nombre: { type: string }
+        usuario: { type: string }
+        rol: { $ref: '#/components/schemas/Rol' }
+        activo: { type: integer, enum: [0, 1] }
+        creado_en: { type: string }
+    UsuarioCrear:
+      type: object
+      required: [nombre, usuario, password, rol]
+      properties:
+        nombre: { type: string }
+        usuario: { type: string, minLength: 3 }
+        password: { type: string, minLength: 6 }
+        rol: { $ref: '#/components/schemas/Rol' }
+    OdtCrear:
+      type: object
+      required: [codigo_obra, fecha_recepcion, procedencia, fecha_programacion, num_barras, ensayo, responsable_id]
+      properties:
+        numero_odt: { type: string, description: Opcional; se autogenera si se omite }
+        codigo_obra: { type: string }
+        fecha_recepcion: { type: string, format: date }
+        procedencia: { type: string }
+        fecha_programacion: { type: string, format: date }
+        num_barras: { type: integer, minimum: 1, maximum: 8 }
+        numeros_barra: { type: array, items: { type: integer }, description: 'Números asignados por el cliente; por defecto 1..n' }
+        ensayo: { $ref: '#/components/schemas/Ensayo' }
+        responsable_id: { type: integer, description: ID de un analista de ensayos activo }
+    Odt:
+      type: object
+      properties:
+        id: { type: integer }
+        numero_odt: { type: string }
+        codigo_obra: { type: string }
+        fecha_recepcion: { type: string }
+        procedencia: { type: string }
+        fecha_programacion: { type: string }
+        num_barras: { type: integer }
+        ensayo: { $ref: '#/components/schemas/Ensayo' }
+        estado: { $ref: '#/components/schemas/Estado' }
+        responsable_id: { type: integer }
+        responsable_nombre: { type: string }
+        programado_por_nombre: { type: string }
+        consecutivo: { type: integer, nullable: true }
+        codigo_informe: { type: string, nullable: true }
+    Barra:
+      type: object
+      properties:
+        numero_barra: { type: integer }
+        descripcion: { type: string, nullable: true }
+        diametro: { type: number, nullable: true }
+        longitud_cm: { type: number, nullable: true }
+        masa_g: { type: number, nullable: true }
+        espaciamiento_resaltes_s: { type: number, nullable: true }
+        longitud_resaltes_cm: { type: number, nullable: true }
+        numero_resaltes: { type: integer, nullable: true }
+        fuerza_fluencia_kn: { type: number, nullable: true }
+        fuerza_maxima_kn: { type: number, nullable: true }
+        altura_resaltes: { type: object, description: 'A/B → r1/r2 → 3 mediciones (mm)' }
+        ancho_vena: { type: object, description: 'v1/v2 → 3 mediciones (mm)' }
+        calculos:
+          type: object
+          description: Promedios y valores derivados (h, e, s, masa lineal)
+    OdtDetalle:
+      allOf:
+        - $ref: '#/components/schemas/Odt'
+        - type: object
+          properties:
+            barras: { type: array, items: { $ref: '#/components/schemas/Barra' } }
+            observaciones: { type: array, items: { $ref: '#/components/schemas/Observacion' } }
+    Observacion:
+      type: object
+      properties:
+        id: { type: integer }
+        etapa: { type: string, enum: [REGISTRO_FUERZAS, REVISION_INFORME] }
+        texto: { type: string }
+        rol: { type: string }
+        autor: { type: string }
+        creado_en: { type: string }
+    EjecucionRequest:
+      type: object
+      required: [barras]
+      properties:
+        barras:
+          type: array
+          minItems: 1
+          maxItems: 8
+          items:
+            type: object
+            required: [numero_barra]
+            properties:
+              numero_barra: { type: integer }
+              descripcion: { type: string }
+              diametro: { type: number }
+              longitud_cm: { type: number }
+              masa_g: { type: number }
+              espaciamiento_resaltes_s: { type: number }
+              longitud_resaltes_cm: { type: number }
+              numero_resaltes: { type: integer }
+              altura_resaltes: { type: object }
+              ancho_vena: { type: object }
+    FuerzasRequest:
+      type: object
+      required: [barras]
+      properties:
+        barras:
+          type: array
+          items:
+            type: object
+            required: [numero_barra]
+            properties:
+              numero_barra: { type: integer }
+              fuerza_fluencia_kn: { type: number }
+              fuerza_maxima_kn: { type: number }
