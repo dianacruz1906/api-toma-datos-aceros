@@ -1,0 +1,10 @@
+ENLACE DEL REPOSITORIO (GitHub/GitLab)
+======================================
+https://github.com/SU_USUARIO/api-toma-datos-aceros      <-- REEMPLAZAR por su enlace real
+
+Para publicarlo (desde la carpeta api-toma-datos-aceros, que ya contiene el repositorio Git con su historial):
+
+  git config user.name  "Su Nombre"
+  git config user.email "su_correo@ejemplo.com"
+  git remote add origin https://github.com/SU_USUARIO/api-toma-datos-aceros.git
+  git push -u origin main
