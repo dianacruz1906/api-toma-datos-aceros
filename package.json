@@ -1,14 +1,17 @@
 {
   "name": "api-toma-datos-aceros",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "API REST - Programa de mejoramiento de toma de datos, ensayos de aceros (INGEYMA LTDA)",
+  "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node src/db/seed.js",
+    "test": "node --test test/"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^13.0.3",
