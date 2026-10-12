@@ -4,3 +4,4 @@ storage/*
 !storage/.gitkeep
 data/*.db
 *.log
+.DS_Store
